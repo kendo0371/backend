@@ -17,8 +17,12 @@ function auth(req, res, next) {
   next();
 }
 
+// ?profileId=2 гэвэл тухайн profile-ийн цувралууд л ирнэ.
 app.get("/movies", auth, async (req, res) => {
-  const result = await sql`SELECT * FROM movies WHERE user_id=${req.userId}`;
+  const profileId = Number(req.query.profileId) || null;
+  const result = profileId
+    ? await sql`SELECT * FROM movies WHERE user_id=${req.userId} AND profileid=${profileId}`
+    : await sql`SELECT * FROM movies WHERE user_id=${req.userId}`;
   res.json({ result });
 });
 
@@ -28,10 +32,10 @@ app.get("/profiles", async (req, res) => {
 });
 
 app.post("/movies", auth, async (req, res) => {
-  const { title, status } = req.body;
+  const { title, status, profileId } = req.body;
 
-  const result = await sql`INSERT INTO movies(title,status,user_id)
-    VALUES(${title}, ${status}, ${req.userId})`;
+  const result = await sql`INSERT INTO movies(title,status,user_id,profileid)
+    VALUES(${title}, ${status}, ${req.userId}, ${profileId ?? null})`;
   res.json({ result });
 });
 
