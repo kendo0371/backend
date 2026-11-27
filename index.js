@@ -49,6 +49,12 @@ app.delete("/movies/:id", auth, async (req, res) => {
   res.json({ result });
 });
 
-app.listen(4000, () => {
-  console.log("Server is running on http://localhost:4000");
-});
+// Vercel дээр app-ийг export хийхэд л болно, listen зөвхөн local-д.
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
